@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Subject-Verb Agreement Game</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f4f0; color: #1a1a1a; min-height: 100vh; padding: 2rem 1rem; }
+.container { max-width: 680px; margin: 0 auto; }
+h1 { font-size: 20px; font-weight: 600; margin-bottom: 0.25rem; }
+.subtitle { font-size: 14px; color: #666; margin-bottom: 1.5rem; }
+.round-label { font-size: 11px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem; }
+.score-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+.sc { background: #ebe9e2; border-radius: 8px; padding: 0.6rem 1rem; text-align: center; }
+.sc-num { font-size: 22px; font-weight: 600; }
+.sc-label { font-size: 12px; color: #666; margin-top: 2px; }
+.prog-wrap { background: #ebe9e2; border-radius: 999px; height: 6px; margin-bottom: 1.25rem; overflow: hidden; }
+.prog-fill { height: 6px; border-radius: 999px; background: #3b6d11; transition: width 0.3s; }
+.card { background: #fff; border: 1px solid #e0ded6; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+.badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 6px; margin-bottom: 1rem; font-weight: 600; }
+.b-s { background: #ddeeff; color: #0c447c; }
+.b-p { background: #e6f5d0; color: #27500a; }
+.b-c { background: #fef0d4; color: #633806; }
+.b-u { background: #fce8f0; color: #72243e; }
+.sentence { font-size: 18px; line-height: 1.7; margin-bottom: 1.25rem; }
+.blank-span { display: inline-block; min-width: 60px; border-bottom: 2px solid #aaa; text-align: center; padding: 0 4px; }
+.choices { display: flex; gap: 10px; flex-wrap: wrap; }
+.cbtn { padding: 0.5rem 1.4rem; background: #fff; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; cursor: pointer; color: #1a1a1a; }
+.cbtn:hover { background: #f0ede6; }
+.cbtn.ok { background: #e6f5d0 !important; border-color: #3b6d11 !important; color: #173404 !important; }
+.cbtn.no { background: #fde8e8 !important; border-color: #a32d2d !important; color: #501313 !important; }
+.cbtn:disabled { cursor: not-allowed; opacity: 0.75; }
+.fb { margin-top: 1rem; font-size: 14px; padding: 0.65rem 1rem; border-left: 3px solid; line-height: 1.6; }
+.fb.ok { background: #e6f5d0; color: #173404; border-color: #3b6d11; }
+.fb.no { background: #fde8e8; color: #501313; border-color: #a32d2d; }
+.hint { font-size: 12px; color: #aaa; margin-top: 0.75rem; }
+.gate { background: #fff; border: 1px solid #e0ded6; border-radius: 12px; padding: 2rem 1.5rem; text-align: center; }
+.gate-title { font-size: 22px; font-weight: 600; margin-bottom: 0.5rem; }
+.gate-sub { font-size: 15px; color: #555; margin-bottom: 1.5rem; }
+.gate-retry-box { background: #fde8e8; border: 1px solid #f09595; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; text-align: left; }
+.gate-retry-box p { font-size: 14px; color: #501313; margin-bottom: 0.6rem; font-weight: 600; }
+.missed-list { font-size: 13px; color: #791f1f; line-height: 2; }
+.action-btn { display: inline-block; padding: 0.6rem 1.6rem; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; margin-top: 0.5rem; }
+.action-btn:hover { background: #f0ede6; }
+.cloze-passage { font-size: 16px; line-height: 2.6; color: #1a1a1a; }
+.cloze-sel { font-size: 14px; border: 1px solid #ccc; border-radius: 6px; padding: 3px 6px; background: #f5f4f0; color: #1a1a1a; cursor: pointer; margin: 0 3px; }
+.cloze-sel.ok { background: #e6f5d0; border-color: #3b6d11; color: #173404; }
+.cloze-sel.no { background: #fde8e8; border-color: #a32d2d; color: #501313; }
+.cloze-fb-item { font-size: 13px; padding: 0.4rem 0.75rem; border-left: 3px solid; margin-bottom: 6px; line-height: 1.5; }
+.cloze-fb-item.ok { background: #e6f5d0; color: #173404; border-color: #3b6d11; }
+.cloze-fb-item.no { background: #fde8e8; color: #501313; border-color: #a32d2d; }
+.end { text-align: center; padding: 3rem 1rem; }
+.end-num { font-size: 56px; font-weight: 700; }
+.end-msg { font-size: 16px; color: #555; margin: 0.5rem 0 1.5rem; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Subject-verb agreement</h1>
+  <p class="subtitle">Primary 3 &mdash; two rounds. Score 12/12 in Round 1 to unlock Round 2.</p>
+  <div id="root"></div>
+</div>
+<script>
+(function() {
+
+var R1 = [
+  {cat:"s",sentence:"The dog ___ loudly at night.",options:["bark","barks"],answer:"barks",exp:"'The dog' is singular — use 'barks'."},
+  {cat:"p",sentence:"The boys ___ football in the field.",options:["plays","play"],answer:"play",exp:"'The boys' is plural — use 'play' (no -s)."},
+  {cat:"c",sentence:"The committee ___ meeting tomorrow.",options:["is","are"],answer:"is",exp:"'The committee' is a collective noun acting as one unit — use 'is'."},
+  {cat:"u",sentence:"The milk in the fridge ___ gone off.",options:["has","have"],answer:"has",exp:"'Milk' is uncountable — always takes a singular verb like 'has'."},
+  {cat:"s",sentence:"My teacher ___ English very well.",options:["speak","speaks"],answer:"speaks",exp:"'My teacher' is singular — use 'speaks'."},
+  {cat:"p",sentence:"The leaves ___ off the trees in autumn.",options:["fall","falls"],answer:"fall",exp:"'The leaves' is plural — use 'fall'."},
+  {cat:"c",sentence:"The audience ___ clapping loudly.",options:["was","were"],answer:"was",exp:"'The audience' is a collective noun treated as one group — use 'was'."},
+  {cat:"u",sentence:"The equipment ___ been checked.",options:["has","have"],answer:"has",exp:"'Equipment' is uncountable — use 'has'."},
+  {cat:"s",sentence:"She ___ to school by bus every day.",options:["go","goes"],answer:"goes",exp:"'She' is singular — use 'goes'."},
+  {cat:"p",sentence:"The workers ___ on strike last week.",options:["was","were"],answer:"were",exp:"'The workers' is plural — use 'were'."},
+  {cat:"c",sentence:"A pride of lions ___ resting under the tree.",options:["is","are"],answer:"is",exp:"'A pride' is a collective noun — use 'is'."},
+  {cat:"u",sentence:"The information ___ very useful.",options:["is","are"],answer:"is",exp:"'Information' is uncountable — use 'is'."}
+];
+
+var CLOZE_SEGMENTS = [
+  "Our class ",null," on a trip to the zoo last Saturday. The whole school ",null,
+  " very excited. A group of students ",null," near the lion enclosure. The lions ",null,
+  " loudly, and everyone ",null," a little scared. The zookeeper, Mr Tan, ",null,
+  " us about the animals. He said that equipment used to feed the lions ",null,
+  " cleaned every day. The water in the drinking troughs also ",null,
+  " replaced twice daily. Later, a flock of flamingos ",null,
+  " across the pond. The crowd ",null,
+  " in amazement. Our teacher said that wildlife ",null,
+  " precious and we must protect it. Everyone ",null," home happy that day."
+];
+
+var BLANKS = [
+  {options:["go","went"],answer:"went",exp:"'Our class' is singular (past tense) — 'went'."},
+  {options:["was","were"],answer:"was",exp:"'The whole school' is a collective noun — 'was'."},
+  {options:["stood","stand"],answer:"stood",exp:"'A group of students' is collective, past tense — 'stood'."},
+  {options:["roared","roars"],answer:"roared",exp:"'The lions' is plural, past tense — 'roared'."},
+  {options:["felt","feel"],answer:"felt",exp:"'Everyone' is singular — 'felt'."},
+  {options:["told","tell"],answer:"told",exp:"'Mr Tan' is singular, past tense — 'told'."},
+  {options:["is","are"],answer:"is",exp:"'Equipment' is uncountable — 'is'."},
+  {options:["is","are"],answer:"is",exp:"'Water' is uncountable — 'is'."},
+  {options:["glided","glide"],answer:"glided",exp:"'A flock' is collective, past tense — 'glided'."},
+  {options:["gasped","gasp"],answer:"gasped",exp:"'The crowd' is collective, past tense — 'gasped'."},
+  {options:["is","are"],answer:"is",exp:"'Wildlife' is uncountable — 'is'."},
+  {options:["went","go"],answer:"went",exp:"'Everyone' is singular, past tense — 'went'."}
+];
+
+var catLabel = {s:"Singular subject",p:"Plural subject",c:"Collective noun",u:"Uncountable noun"};
+var catClass = {s:"b-s",p:"b-p",c:"b-c",u:"b-u"};
+
+var phase = "r1";
+var r1idx = 0, r1score = 0, r1answered = false, r1wrong = [], r1shuffled = [];
+var r2submitted = false, r2score = 0, r2feedback = [];
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function el(id) { return document.getElementById(id); }
+
+function setHTML(id, html) {
+  var e = el(id);
+  if (e) e.innerHTML = html;
+}
+
+function render() {
+  if (phase === "r1") renderR1();
+  else if (phase === "gate") renderGate();
+  else if (phase === "r2") renderR2();
+  else renderEnd();
+}
+
+function renderR1() {
+  var q = r1shuffled[r1idx];
+  var pct = Math.round((r1idx / R1.length) * 100);
+  var sent = q.sentence.replace("___", "<span class='blank-span'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+  var optBtns = q.options.map(function(o) {
+    return '<button class="cbtn" id="btn-' + o + '" data-opt="' + o + '">' + o + '</button>';
+  }).join("");
+
+  setHTML("root",
+    '<div class="round-label">Round 1 of 2 &mdash; sentence practice</div>' +
+    '<div class="score-bar">' +
+      '<div class="sc"><div class="sc-num">' + r1score + '</div><div class="sc-label">Correct</div></div>' +
+      '<div class="sc"><div class="sc-num">' + (r1idx+1) + ' / ' + R1.length + '</div><div class="sc-label">Question</div></div>' +
+      '<div class="sc"><div class="sc-num">' + (R1.length - r1idx - 1) + '</div><div class="sc-label">Left</div></div>' +
+    '</div>' +
+    '<div class="prog-wrap"><div class="prog-fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="card">' +
+      '<span class="badge ' + catClass[q.cat] + '">' + catLabel[q.cat] + '</span>' +
+      '<div class="sentence">' + sent + '</div>' +
+      '<div class="choices" id="choices">' + optBtns + '</div>' +
+      '<div id="r1fb"></div>' +
+      '<div class="hint">Click a word to complete the sentence.</div>' +
+    '</div>' +
+    '<div id="r1nav"></div>'
+  );
+
+  var btns = document.querySelectorAll(".cbtn");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener("click", function(e) {
+      r1Choose(e.currentTarget.getAttribute("data-opt"));
+    });
+  }
+}
+
+function r1Choose(opt) {
+  if (r1answered) return;
+  r1answered = true;
+  var q = r1shuffled[r1idx];
+  var ok = opt === q.answer;
+  if (ok) r1score++; else r1wrong.push(q);
+  var btns = document.querySelectorAll(".cbtn");
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].disabled = true;
+    if (btns[i].getAttribute("data-opt") === q.answer) btns[i].classList.add("ok");
+    else if (btns[i].getAttribute("data-opt") === opt && !ok) btns[i].classList.add("no");
+  }
+  setHTML("r1fb", '<div class="fb ' + (ok?"ok":"no") + '">' + (ok?"Correct! ":"Not quite. ") + q.exp + '</div>');
+  var nav = el("r1nav");
+  if (nav) {
+    nav.innerHTML = '<button class="action-btn" id="nextbtn">Next &rarr;</button>';
+    el("nextbtn").addEventListener("click", r1Next);
+  }
+}
+
+function r1Next() {
+  r1idx++;
+  r1answered = false;
+  if (r1idx >= R1.length) { phase = "gate"; render(); return; }
+  render();
+}
+
+function renderGate() {
+  var ok = r1score === R1.length;
+  var inner;
+  if (ok) {
+    inner = '<div style="font-size:32px;margin-bottom:0.5rem;">&#9733;</div>' +
+      '<div class="gate-title">Perfect score!</div>' +
+      '<div class="gate-sub">You answered all 12 correctly. You may now move on to Round 2.</div>' +
+      '<button class="action-btn" id="tor2btn">Start Round 2 &rarr;</button>';
+  } else {
+    var missed = r1wrong.map(function(q) {
+      return '<div>&bull; ' + q.sentence + ' &rarr; <strong>' + q.answer + '</strong></div>';
+    }).join("");
+    inner = '<div class="gate-title">Score: ' + r1score + ' / 12</div>' +
+      '<div class="gate-sub">You need 12/12 to move on. Review what you missed, then try again.</div>' +
+      '<div class="gate-retry-box"><p>Questions to review:</p><div class="missed-list">' + missed + '</div></div>' +
+      '<button class="action-btn" id="retryr1btn">Try Round 1 again &rarr;</button>';
+  }
+  setHTML("root", '<div class="gate">' + inner + '</div>');
+  if (ok) {
+    el("tor2btn").addEventListener("click", function() { phase = "r2"; render(); });
+  } else {
+    el("retryr1btn").addEventListener("click", retryR1);
+  }
+}
+
+function retryR1() {
+  r1idx = 0; r1score = 0; r1answered = false; r1wrong = [];
+  r1shuffled = shuffle(R1);
+  phase = "r1"; render();
+}
+
+function renderR2() {
+  var blankIdx = 0;
+  var passageHTML = "";
+  for (var i = 0; i < CLOZE_SEGMENTS.length; i++) {
+    if (CLOZE_SEGMENTS[i] !== null) {
+      passageHTML += CLOZE_SEGMENTS[i];
+    } else {
+      var bl = BLANKS[blankIdx];
+      var dis = r2submitted ? " disabled" : "";
+      var cls = "";
+      if (r2submitted && r2feedback[blankIdx]) {
+        cls = r2feedback[blankIdx].ok ? " ok" : " no";
+      }
+      var savedVal = (r2feedback[blankIdx] && r2feedback[blankIdx].chosen) ? r2feedback[blankIdx].chosen : "";
+      var opts = '<option value="">—</option>' + bl.options.map(function(o) {
+        return '<option value="' + o + '"' + (savedVal === o ? " selected" : "") + '>' + o + '</option>';
+      }).join("");
+      passageHTML += '<select class="cloze-sel' + cls + '" id="cl' + blankIdx + '"' + dis + '>' + opts + '</select>';
+      blankIdx++;
+    }
+  }
+
+  var fbHTML = "";
+  if (r2submitted) {
+    var allOk = r2score === BLANKS.length;
+    fbHTML = '<div style="margin-top:1.25rem;">' +
+      '<div style="font-size:15px;font-weight:600;margin-bottom:0.75rem;">Score: ' + r2score + ' / ' + BLANKS.length + (allOk ? " — well done!" : "") + '</div>';
+    for (var j = 0; j < r2feedback.length; j++) {
+      if (!r2feedback[j].ok) {
+        fbHTML += '<div class="cloze-fb-item no">Blank ' + (j+1) + ': the answer is <strong>' + r2feedback[j].answer + '</strong>. ' + r2feedback[j].exp + '</div>';
+      }
+    }
+    if (allOk) fbHTML += '<div class="cloze-fb-item ok">All correct — excellent work!</div>';
+    fbHTML += '</div>';
+  }
+
+  var actionBtn = "";
+  if (!r2submitted) {
+    actionBtn = '<button class="action-btn" id="checkbtn" style="margin-top:1.25rem;">Check my answers</button>';
+  } else if (r2score === BLANKS.length) {
+    actionBtn = '<button class="action-btn" id="finalbtn" style="margin-top:1rem;">See final result &rarr;</button>';
+  } else {
+    actionBtn = '<button class="action-btn" id="retryr2btn" style="margin-top:1rem;">Try again &rarr;</button>';
+  }
+
+  setHTML("root",
+    '<div class="round-label">Round 2 of 2 &mdash; cloze passage</div>' +
+    '<div class="card">' +
+      '<p style="font-size:13px;color:#888;margin-bottom:1rem;">Choose the correct verb for each blank to complete the passage.</p>' +
+      '<div class="cloze-passage">' + passageHTML + '</div>' +
+      actionBtn + fbHTML +
+    '</div>'
+  );
+
+  if (!r2submitted && el("checkbtn")) {
+    el("checkbtn").addEventListener("click", submitCloze);
+  }
+  if (r2submitted && r2score === BLANKS.length && el("finalbtn")) {
+    el("finalbtn").addEventListener("click", function() { phase = "end"; render(); });
+  }
+  if (r2submitted && r2score < BLANKS.length && el("retryr2btn")) {
+    el("retryr2btn").addEventListener("click", retryR2);
+  }
+}
+
+function submitCloze() {
+  var fb = [];
+  var score = 0;
+  for (var i = 0; i < BLANKS.length; i++) {
+    var sel = el("cl" + i);
+    var val = sel ? sel.value : "";
+    var ok = val === BLANKS[i].answer;
+    if (ok) score++;
+    fb.push({ok: ok, answer: BLANKS[i].answer, chosen: val, exp: BLANKS[i].exp});
+  }
+  r2submitted = true; r2score = score; r2feedback = fb;
+  renderR2();
+}
+
+function retryR2() {
+  r2submitted = false; r2score = 0; r2feedback = [];
+  renderR2();
+}
+
+function renderEnd() {
+  setHTML("root",
+    '<div class="end">' +
+      '<div class="end-num">24 / 24</div>' +
+      '<div class="end-msg">You completed both rounds with a perfect score. Outstanding work!</div>' +
+      '<button class="action-btn" id="restartbtn">Play again from the start</button>' +
+    '</div>'
+  );
+  el("restartbtn").addEventListener("click", fullRestart);
+}
+
+function fullRestart() {
+  r1idx = 0; r1score = 0; r1answered = false; r1wrong = [];
+  r2submitted = false; r2score = 0; r2feedback = [];
+  phase = "r1";
+  r1shuffled = shuffle(R1);
+  render();
+}
+
+r1shuffled = shuffle(R1);
+render();
+
+})();
+</script>
+</body>
+</html>
